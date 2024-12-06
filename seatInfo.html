@@ -42,7 +42,7 @@
         <caption>
             <div class="caption-container">
                 <span>1층 ~ 5층 좌석 현황</span>
-                <span>(총/현재)</span>
+                <span>(현재/총)</span>
             </div>
         </caption>
         <thead>
@@ -73,9 +73,9 @@
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${floor}</td>
-                    <td>${seatData[floor].disabled.total}/${seatData[floor].disabled.current}</td>
-                    <td>${seatData[floor].plug.total}/${seatData[floor].plug.current}</td>
-                    <td>${seatData[floor].regular.total}/${seatData[floor].regular.current}</td>
+                    <td>${seatData[floor].disabled.current}/${seatData[floor].disabled.total}</td>
+                    <td>${seatData[floor].plug.current}/${seatData[floor].plug.total}</td>
+                    <td>${seatData[floor].regular.current}/${seatData[floor].regular.total}</td>
                 `;
                 tableBody.appendChild(row);
             }
