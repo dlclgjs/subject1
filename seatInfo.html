@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>층별 잔여 좌석 현황</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            text-align: center;
+            padding: 10px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        caption {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .caption-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>층별 잔여 좌석 현황</h1>
+
+    <table>
+        <caption>
+            <div class="caption-container">
+                <span>1층 ~ 5층 좌석 현황</span>
+                <span>(총/현재)</span>
+            </div>
+        </caption>
+        <thead>
+            <tr>
+                <th>층</th>
+                <th>장애인석</th>
+                <th>콘센트석</th>
+                <th>일반석</th>
+            </tr>
+        </thead>
+        <tbody id="seats-table-body"></tbody>
+    </table>
+
+    <script>
+        const seatData = {
+            "1층": { disabled: { total: 5, current: 0 }, plug: { total: 20, current: 0 }, regular: { total: 50, current: 0 } },
+            "2층": { disabled: { total: 8, current: 0 }, plug: { total: 15, current: 0 }, regular: { total: 60, current: 0 } },
+            "3층": { disabled: { total: 6, current: 0 }, plug: { total: 10, current: 0 }, regular: { total: 70, current: 0 } },
+            "4층": { disabled: { total: 7, current: 0 }, plug: { total: 12, current: 0 }, regular: { total: 65, current: 0 } },
+            "1열람실": { disabled: { total: 6, current: 0 }, plug: { total: 24, current: 0 }, regular: { total: 368, current: 0 } },
+            "2열람실": { disabled: { total: 11, current: 0 }, plug: { total: 18, current: 0 }, regular: { total: 312, current: 0 } }
+        };
+
+        // 테이블에 데이터를 동적으로 추가
+        function generateTableRows() {
+            const tableBody = document.getElementById("seats-table-body");
+            for (const floor in seatData) {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${floor}</td>
+                    <td>${seatData[floor].disabled.total}/${seatData[floor].disabled.current}</td>
+                    <td>${seatData[floor].plug.total}/${seatData[floor].plug.current}</td>
+                    <td>${seatData[floor].regular.total}/${seatData[floor].regular.current}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+        }
+
+        // 초기화
+        generateTableRows();
+    </script>
+</body>
+</html>
