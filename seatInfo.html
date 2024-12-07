@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,19 +28,62 @@
             font-weight: bold;
             text-align: center;
         }
-        .caption-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
     </style>
+    <script>
+        function getSeatData() {
+            const data = JSON.parse(localStorage.getItem("seatData"));
+            if (!data) return null;
+
+            const currentTime = new Date().getTime();
+            const expiredData = {}; // 만료된 데이터를 담을 객체
+
+            for (let floor in data) {
+                for (let seatType in data[floor]) {
+                    const seat = data[floor][seatType];
+                    const elapsedTime = currentTime - seat.timestamp;
+
+                    if (elapsedTime > 90 * 60 * 1000) {  // 90분 경과한 경우
+                        expiredData[floor] = expiredData[floor] || {};
+                        expiredData[floor][seatType] = null;  // 만료된 항목은 null로 설정
+                    } else {
+                        expiredData[floor] = expiredData[floor] || {};
+                        expiredData[floor][seatType] = seat;  // 만료되지 않은 항목은 그대로 저장
+                    }
+                }
+            }
+
+            localStorage.setItem("seatData", JSON.stringify(expiredData));  // 만료된 항목을 제외한 새 데이터를 저장
+            return expiredData;
+        }
+
+        function generateTableRows() {
+            const seatData = getSeatData();  // 만료된 항목 삭제 후 갱신된 데이터 가져오기
+            const tableBody = document.getElementById("seats-table-body");
+            tableBody.innerHTML = "";  // 기존 데이터 초기화
+
+            for (const floor in seatData) {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${floor}</td>
+                    <td>${seatData[floor].disabled ? seatData[floor].disabled.current : 0}/${seatData[floor].disabled.total}</td>
+                    <td>${seatData[floor].plug ? seatData[floor].plug.current : 0}/${seatData[floor].plug.total}</td>
+                    <td>${seatData[floor].regular ? seatData[floor].regular.current : 0}/${seatData[floor].regular.total}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+        }
+
+        window.onload = function () {
+            generateTableRows(); // 페이지 로드 시 테이블 생성
+        };
+    </script>
 </head>
 <body>
     <h1>층별 잔여 좌석 현황</h1>
 
     <table>
         <caption>
-            <div class="caption-container">
+            <div class="caption-container" style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
                 <span>1층 ~ 5층 좌석 현황</span>
                 <span>(현재/총)</span>
             </div>
@@ -55,34 +98,5 @@
         </thead>
         <tbody id="seats-table-body"></tbody>
     </table>
-
-    <script>
-        const seatData = {
-            "1층": { disabled: { total: 5, current: 0 }, plug: { total: 20, current: 0 }, regular: { total: 50, current: 0 } },
-            "2층": { disabled: { total: 8, current: 0 }, plug: { total: 15, current: 0 }, regular: { total: 60, current: 0 } },
-            "3층": { disabled: { total: 6, current: 0 }, plug: { total: 10, current: 0 }, regular: { total: 70, current: 0 } },
-            "4층": { disabled: { total: 7, current: 0 }, plug: { total: 12, current: 0 }, regular: { total: 65, current: 0 } },
-            "1열람실": { disabled: { total: 6, current: 0 }, plug: { total: 24, current: 0 }, regular: { total: 368, current: 0 } },
-            "2열람실": { disabled: { total: 11, current: 0 }, plug: { total: 18, current: 0 }, regular: { total: 312, current: 0 } }
-        };
-
-        // 테이블에 데이터를 동적으로 추가
-        function generateTableRows() {
-            const tableBody = document.getElementById("seats-table-body");
-            for (const floor in seatData) {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${floor}</td>
-                    <td>${seatData[floor].disabled.current}/${seatData[floor].disabled.total}</td>
-                    <td>${seatData[floor].plug.current}/${seatData[floor].plug.total}</td>
-                    <td>${seatData[floor].regular.current}/${seatData[floor].regular.total}</td>
-                `;
-                tableBody.appendChild(row);
-            }
-        }
-
-        // 초기화
-        generateTableRows();
-    </script>
 </body>
 </html>
